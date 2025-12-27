@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ペンペンのつりんちゅ感想記</title>
+<link rel="stylesheet" href="css/osakanadiary_modern.css">
+</head>
+<body>
+
+<div class="floating-search-btn" id="floatingSearchBtn">検索</div>
+<div class="modal-overlay" id="modalOverlay"></div>
+
+<div class="container">
+  <div class="topbar">
+    <div class="header">
+      <img src="image/penguin_fishing.png" alt="ペンギン" class="header-icon">
+      ペンペンのつりんちゅ感想記
+    </div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+
+  <div class="controls card" id="controlsBlock">
+    <input id="searchBox" placeholder="検索（ウオ名）">
+    <select id="filterCategory"><option value="">カテゴリ（絞り込み）</option></select>
+    <select id="filterInsult"><option value="">罵倒度（絞り込み）</option></select>
+    <select id="filterArea"><option value="">エリア（絞り込み）</option></select>
+    <label class="toggle-label">
+      <input id="filterByImpression" type="checkbox" class="toggle-checkbox">
+      <span class="toggle-switch"></span>
+      <span class="toggle-text">感想が記載されているウオのみ表示</span>
+    </label>
+  </div>
+
+  <div id="tableContainer" style="margin-top:14px"></div>
+
+  <div id="tooltip" class="tooltip"></div>
+</div>
+
+<script>
+const floatingBtn = document.getElementById('floatingSearchBtn');
+const modalOverlay = document.getElementById('modalOverlay');
+const controlsBlock = document.getElementById('controlsBlock');
+
+floatingBtn.addEventListener('click', () => {
+  controlsBlock.classList.toggle('modal-visible');
+  modalOverlay.classList.toggle('visible');
+  if(controlsBlock.classList.contains('modal-visible')){
+    controlsBlock.classList.remove('hidden-on-scroll');
+  }
+});
+
+modalOverlay.addEventListener('click', () => {
+  controlsBlock.classList.remove('modal-visible');
+  modalOverlay.classList.remove('visible');
+});
+
+const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNtyKhmzmP8ZmGfcRCYPayfbwD9gqcK6AXFMoJexyRXSl22Oqw3VgFw9S2MjWCGQ/pub?output=csv";
+
+let allData=[];
+let currentPatch="最新";
+let filterByImpressionMode=false;
+const tabsOrder=["最新","新生","蒼天","紅蓮","漆黒","暁月","黄金"];
+
+function parseCSV(text){
+  const rows=[];let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i],n=text[i+1];
+    if(c==='"'&&q&&n==='"'){cur+='"';i++}
+    else if(c==='"'){q=!q}
+    else if(c===','&&!q){row.push(cur);cur=''}
+    else if((c==='\n'||c==='\r')&&!q){
+      if(cur!==''||row.length){row.push(cur);rows.push(row);row=[];cur=''}
+      if(c==='\r'&&n==='\n')i++
+    } else cur+=c
+  }
+  if(cur!==''||row.length){row.push(cur);rows.push(row)}
+  return rows;
+}
+
+function escapeHTML(s){
+  return (s||"")
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;')
+    .replace(/'/g,'&#39;');
+}
+
+function buildTabs(){
+  const t=document.getElementById("tabs");
+  t.innerHTML="";
+  tabsOrder.forEach(p=>{
+    const el=document.createElement("div");
+    el.textContent=p;
+    el.className="tab"+(p===currentPatch?" active":"");
+    el.addEventListener("click",()=>{currentPatch=p;render();});
+    t.appendChild(el);
+  });
+}
+
+function uniqueValues(key){
+  return [...new Set(allData.map(d=>d[key]).filter(Boolean))];
+}
+
+function setupFilters(){
+  const c=document.getElementById("filterCategory");
+  const i=document.getElementById("filterInsult");
+  const a=document.getElementById("filterArea");
+  const imp=document.getElementById("filterByImpression");
+
+  uniqueValues("カテゴリ").forEach(v=>c.appendChild(new Option(v,v)));
+  uniqueValues("罵倒度").forEach(v=>i.appendChild(new Option(v,v)));
+  uniqueValues("エリア").forEach(v=>a.appendChild(new Option(v,v)));
+
+  c.onchange=i.onchange=a.onchange=render;
+  document.getElementById("searchBox").oninput=render;
+  imp.onchange=e=>{filterByImpressionMode=e.target.checked;render();};
+}
+
+function makeImpression(text){
+  if(!text) return "";
+  text=text.replace(/\r?\n/g,"\n");
+  if(text.length<=100) return text.replace(/\n/g,"<br>");
+  const short=text.slice(0,100)+"…";
+  const id="i"+Math.random().toString(36).slice(2);
+  return `
+    <span id="${id}-s">${short.replace(/\n/g,"<br>")}</span>
+    <span id="${id}-f" style="display:none;white-space:pre-wrap;">${text}</span>
+    <span class="more" data-target="${id}" role="button" tabindex="0">もっと見る</span>
+  `;
+}
+
+document.addEventListener("click",e=>{
+  if(e.target.classList.contains("more")){
+    const id=e.target.dataset.target;
+    const s=document.getElementById(id+"-s");
+    const f=document.getElementById(id+"-f");
+    const open=s.style.display==="none";
+    s.style.display=open?"":"none";
+    f.style.display=open?"none":"";
+    e.target.textContent=open?"もっと見る":"閉じる";
+  }
+});
+
+const tooltip=document.getElementById("tooltip");
+document.addEventListener("click",e=>{
+  if(!e.target.classList.contains("spot-link")){
+    tooltip.style.display="none";
+  }
+});
+
+function render(){
+  buildTabs();
+
+  const search=document.getElementById("searchBox").value.toLowerCase();
+  const fa=document.getElementById("filterArea").value;
+  const fi=document.getElementById("filterInsult").value;
+  const fc=document.getElementById("filterCategory").value;
+
+  let data;
+  if(currentPatch==="最新"){
+    data=allData.filter(d=>{
+      const v=((d["最新"]||"")+"").trim().toLowerCase();
+      return v==="1" || v==="true" || v==="yes";
+    });
+  } else {
+    data=allData.filter(d=>d["パッチ"]===currentPatch);
+  }
+
+  if(search) data=data.filter(d=>
+    (d["ウオ名"]||"").toLowerCase().includes(search)
+  );
+  if(fa) data=data.filter(d=>d["エリア"]===fa);
+  if(fi) data=data.filter(d=>d["罵倒度"]===fi);
+  if(fc) data=data.filter(d=>d["カテゴリ"]===fc);
+  if(filterByImpressionMode) data=data.filter(d=>(d["感想"]||"" ).trim().length>0);
+
+  const rows=data.map(d=>{
+    const catchDate = (d["仕留めた日"]||"").trim();
+    const fishNameClass = catchDate ? 'fish-name-link' : '';
+    const isLatest = ((d["最新"]||"")+ "").trim().toLowerCase();
+    const latestClass = (isLatest==="1" || isLatest==="true" || isLatest==="yes") ? 'latest-card' : '';
+    const patchBadge = d["パッチ"] ? `<span class="patch-badge">${escapeHTML(d["パッチ"])}</span>` : '';
+    return `
+      <div class="row-card ${latestClass}">
+        <div class="row-field ${fishNameClass}" data-label="ウオ名" data-catch-date="${escapeHTML(catchDate)}">
+          <span class="fish-name-text">${escapeHTML(d["ウオ名"]||"")}</span>
+          ${patchBadge}
+        </div>
+        <div class="row-field" data-label="カテゴリ">${escapeHTML(d["カテゴリ"]||"")}</div>
+        <div class="row-field" data-label="仕留めた日">${escapeHTML(d["仕留めた日"]||"")}</div>
+        <div class="row-field" data-label="罵倒度">${escapeHTML(d["罵倒度"]||"")}</div>
+        <div class="row-field" data-label="感想">${makeImpression(escapeHTML(d["感想"]||""))}</div>
+        <div class="row-field" data-label="釣り場名">
+          <span class="spot-link"
+            data-area="${escapeHTML(d["エリア"]||"")}"
+            data-aeth="${escapeHTML(d["最寄エーテ"]||"")}"
+            data-place="${escapeHTML(d["釣り場名"]||"")}"
+          >${escapeHTML(d["釣り場名"]||"")}</span>
+        </div>
+      </div>
+    `;
+  }).join("");
+
+  document.getElementById("tableContainer").innerHTML=`
+    <div class="rows-container">${rows}</div>
+  `;
+
+  document.querySelectorAll(".spot-link").forEach(el=>{
+    el.addEventListener("click",e=>{
+      e.stopPropagation();
+      const msg=[
+        el.dataset.area,
+        el.dataset.aeth,
+        el.dataset.place
+      ].filter(Boolean).join("_");
+      tooltip.textContent=msg;
+      tooltip.style.left=e.pageX+10+"px";
+      tooltip.style.top=e.pageY+10+"px";
+      tooltip.style.display="block";
+    });
+  });
+
+  document.querySelectorAll(".fish-name-link").forEach(el=>{
+    el.addEventListener("click",e=>{
+      e.stopPropagation();
+      const catchDate = el.dataset.catchDate;
+      if(catchDate){
+        tooltip.textContent="仕留めた日: "+catchDate;
+        tooltip.style.left=e.pageX+10+"px";
+        tooltip.style.top=e.pageY+10+"px";
+        tooltip.style.display="block";
+      }
+    });
+  });
+}
+
+async function init(){
+  const res=await fetch(CSV_URL);
+  const text=await res.text();
+  const rows=parseCSV(text);
+  const head=rows[0];
+  allData=rows.slice(1).filter(r=>r.length>1).map(r=>{
+    const o={};head.forEach((h,i)=>o[h]=r[i]||"");return o;
+  });
+  setupFilters();
+  render();
+}
+init();
+</script>
+</body>
+</html>
