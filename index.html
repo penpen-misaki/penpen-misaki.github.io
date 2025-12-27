@@ -60,7 +60,7 @@ const CSV_URL = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTNtyKhmzmP8ZmG
 let allData=[];
 let currentPatch="最新";
 let filterByImpressionMode=false;
-const tabsOrder=["最新","新生","蒼天","紅蓮","漆黒","暁月","黄金"];
+let patchList=[];
 
 function parseCSV(text){
   const rows=[];let row=[],cur='',q=false;
@@ -90,7 +90,7 @@ function escapeHTML(s){
 function buildTabs(){
   const t=document.getElementById("tabs");
   t.innerHTML="";
-  tabsOrder.forEach(p=>{
+  patchList.forEach(p=>{
     const el=document.createElement("div");
     el.textContent=p;
     el.className="tab"+(p===currentPatch?" active":"");
@@ -244,6 +244,20 @@ async function init(){
   allData=rows.slice(1).filter(r=>r.length>1).map(r=>{
     const o={};head.forEach((h,i)=>o[h]=r[i]||"");return o;
   });
+  
+  // パッチリストを動的に取得
+  const patchSet=new Set();
+  allData.forEach(d=>{
+    if(d["パッチ"]) patchSet.add(d["パッチ"]);
+  });
+  const extractedPatches=Array.from(patchSet);
+  
+  // 「最新」を最初に配置、その後CSVに出現順
+  patchList=["最新"];
+  extractedPatches.forEach(p=>{
+    if(p!=="最新") patchList.push(p);
+  });
+  
   setupFilters();
   render();
 }
