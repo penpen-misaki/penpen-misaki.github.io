@@ -1,0 +1,147 @@
+:root{
+  --bg-0:#071023;
+  --bg-1:linear-gradient(135deg,#071023 0%,#0d1b2a 50%,#142433 100%);
+  --card:#0f1b26cc;
+  --muted:rgba(230,237,243,0.75);
+  --accent:#64b5ff;
+  --accent-2:#ffd27f;
+  --glass:rgba(255,255,255,0.04);
+  --radius:12px;
+  --fw-semibold:600;
+}
+*{box-sizing:border-box}
+html,body{height:100%}
+body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0);color:var(--muted);-webkit-font-smoothing:antialiased;line-height:1.45}
+.container{max-width:1100px;margin:28px auto;padding:20px}
+.header{background:transparent;color:var(--accent-2);font-weight:var(--fw-semibold);font-size:22px;padding:18px 12px;border-radius:10px;text-align:center;letter-spacing:0.6px;display:flex;align-items:center;justify-content:center;gap:12px}
+.header-icon{height:22px;width:auto;vertical-align:middle}
+.topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap}
+.tab{padding:8px 12px;background:var(--glass);border-radius:999px;color:var(--muted);cursor:pointer;border:1px solid transparent;transition:all .18s}
+.tab:hover{transform:translateY(-2px)}
+.tab.active{background:linear-gradient(90deg, rgba(100,181,255,0.12), rgba(255,210,127,0.06));color:var(--accent);box-shadow:0 6px 18px rgba(10,30,60,0.35);border-color:rgba(100,181,255,0.12)}
+.controls{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.controls{background:rgba(40,130,183,0.61)}
+.controls input,.controls select{padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.06);background:rgba(255,255,255,0.02);color:var(--muted);min-width:160px}
+.controls select{color:#fff}
+.controls select option{color:#000;background:#fff}
+.controls input{flex:1;min-width:200px}
+.controls-header{display:none}
+.controls-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;padding:4px 8px;transition:color 0.2s;display:none;z-index:102}
+.controls.modal-visible .controls-close{display:block}
+.controls-close:hover{color:#fff}
+
+/* Floating search button */
+.floating-search-btn{position:fixed;bottom:20px;right:20px;background:var(--accent);color:#000;padding:10px 16px;border-radius:999px;cursor:pointer;font-weight:600;box-shadow:0 4px 12px rgba(100,181,255,0.4);opacity:1;pointer-events:auto;transition:opacity 0.3s,transform 0.3s;z-index:99;font-size:14px}
+.floating-search-btn:active{transform:scale(0.95)}
+
+/* PC: always show floating button at bottom right */
+@media(min-width:901px){
+  .floating-search-btn{opacity:1;pointer-events:auto}
+}
+
+/* Mobile: show "検索" button at bottom right */
+@media(max-width:900px){
+  .floating-search-btn::before{content:'検索';position:absolute}
+  .floating-search-btn{padding:10px 16px;border-radius:999px;background:var(--accent);color:#000;font-size:14px}
+}
+
+/* Modal overlay - darker background */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.75);opacity:0;pointer-events:none;transition:opacity 0.3s;z-index:100}
+
+.modal-overlay.visible{opacity:1;pointer-events:auto}
+
+/* Controls modal state */
+.controls.hidden-on-scroll{position:fixed;top:-9999px}
+.controls.modal-visible{position:fixed!important;top:50%!important;left:50%!important;transform:translate(-50%,-50%)!important;max-width:90%;width:100%;max-height:70vh;overflow-y:auto;z-index:101;box-shadow:0 8px 32px rgba(0,0,0,0.6);animation:slideUp 0.3s ease-out;background:#184960!important}
+
+/* Toggle switch styles */
+.toggle-label{display:flex;align-items:center;gap:10px;cursor:pointer;user-select:none;padding:8px 12px;border-radius:8px;transition:background 0.2s}
+.toggle-label:hover{background:rgba(255,255,255,0.02)}
+.toggle-checkbox{display:none}
+.toggle-switch{width:44px;height:24px;background:rgba(255,255,255,0.2);border-radius:999px;position:relative;transition:background 0.3s}
+.toggle-checkbox:checked+.toggle-switch{background:var(--accent)}
+.toggle-switch::after{content:'';position:absolute;width:20px;height:20px;background:#fff;border-radius:50%;top:2px;left:2px;transition:left 0.3s}
+.toggle-checkbox:checked+.toggle-switch::after{left:22px}
+.toggle-text{color:var(--muted);font-size:14px;white-space:nowrap}
+
+@keyframes slideUp{
+  from{opacity:0;transform:translate(-50%,-40%)}
+  to{opacity:1;transform:translate(-50%,-50%)}
+}
+.card{background:rgba(255,255,255,0.03);border-radius:var(--radius);padding:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 8px 30px rgba(2,6,23,0.5)}
+.controls.card{background:rgba(15,27,38,0.7)}
+
+/* Div-based rows container */
+.rows-container{display:flex;flex-direction:column;gap:10px}
+.row-card{display:grid;grid-template-columns:1fr 1fr;gap:16px;padding:16px;background:rgba(15,27,38,0.7);backdrop-filter:blur(4px);border-radius:var(--radius);border:1px solid rgba(255,255,255,0.03)}
+
+/* Gaming color animation for latest cards */
+.row-card.latest-card{position:relative;border:none;padding:0}
+.row-card.latest-card::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:linear-gradient(45deg,#ff0000,#ff7700,#ffff00,#00ff00,#0099ff,#6600ff,#ff0099,#ff0000);background-size:400% 400%;border-radius:var(--radius);z-index:0;animation:gaming-border 3s linear infinite}
+.row-card.latest-card::after{content:'';position:absolute;top:2px;left:2px;right:2px;bottom:2px;background:rgba(15,27,38,0.95);border-radius:calc(var(--radius) - 2px);z-index:1}
+.row-card.latest-card > *{position:relative;z-index:2}
+.row-card.latest-card{padding:16px}
+@keyframes gaming-border{0%{background-position:0% 50%}50%{background-position:100% 50%}100%{background-position:0% 50%}}
+
+/* Desktop: all fields display with labels */
+.row-field{display:flex;flex-direction:column}
+.row-field::before{content:attr(data-label) ": ";color:var(--muted);font-weight:600;margin-right:6px;display:inline}
+.row-field[data-label="ウオ名"]{grid-column:1/3;font-weight:600;color:#fff;display:flex;flex-direction:row;align-items:center;gap:8px;flex-wrap:nowrap}
+.row-field[data-label="ウオ名"]::before{flex-shrink:0}
+.fish-name-text{flex:0 0 auto}
+.patch-badge{padding:6px 12px;background:var(--glass);border-radius:999px;color:var(--muted);border:1px solid transparent;font-size:13px;font-weight:400;white-space:nowrap;flex-shrink:0;margin-left:auto}
+.row-field[data-label="カテゴリ"]{grid-column:1;color:var(--accent-2)}
+.row-field[data-label="仕留めた日"]{grid-column:1;color:var(--muted);font-size:13px}
+.row-field[data-label="罵倒度"]{grid-column:2;text-align:left;color:var(--muted);font-size:13px}
+.row-field[data-label="感想"]{grid-column:1/3}
+.row-field[data-label="釣り場名"]{grid-column:1/3;color:var(--accent);font-weight:600}
+
+.more{color:var(--accent);cursor:pointer;display:inline-block;padding:4px 8px;background:rgba(100,181,255,0.15);border-radius:6px;font-size:13px;margin-top:4px}
+.spot-link{color:var(--accent);cursor:pointer;font-weight:600}
+.tooltip{position:absolute;background:#071733cc;color:#eaf6ff;padding:10px 12px;border-radius:8px;border:1px solid rgba(255,255,255,0.06);z-index:999;display:none}
+
+/* Tablet: 900px以下 */
+@media(max-width:900px){
+  .container{padding:12px}
+  .topbar{flex-direction:column;align-items:stretch}
+  .controls input{min-width:120px}
+  .tabs{overflow:auto}
+  .row-card{grid-template-columns:1fr;gap:12px;padding:12px}
+  .row-field[data-label="ウオ名"]{grid-column:1}
+  .row-field[data-label="カテゴリ"]{grid-column:1}
+  .row-field[data-label="仕留めた日"]{grid-column:1;display:block}
+  .row-field[data-label="罵倒度"]{grid-column:1;text-align:left}
+  .row-field[data-label="感想"]{grid-column:1}
+  .row-field[data-label="釣り場名"]{grid-column:1}
+}
+
+/* Mobile: 600px以下 */
+@media(max-width:600px){
+  .container{padding:10px}
+  .row-card{grid-template-columns:1fr;gap:8px;padding:12px}
+  
+  /* Fish name, category, insult on single line */
+  .row-field[data-label="ウオ名"],
+  .row-field[data-label="カテゴリ"],
+  .row-field[data-label="罵倒度"]{display:inline-block;margin-right:8px;white-space:nowrap}
+  
+  .row-field[data-label="ウオ名"]{display:flex;width:100%;align-items:center}
+  .row-field[data-label="ウオ名"] .patch-badge{margin-left:auto}
+  
+  /* Fish name with catch date becomes clickable */
+  .row-field.fish-name-link{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:rgba(255,255,255,0.3)}
+  .row-field.fish-name-link:hover{text-decoration-color:rgba(255,255,255,0.6)}
+  
+  .row-field[data-label="仕留めた日"]{display:none}
+  
+  .row-field[data-label="感想"]{display:block;margin-top:4px}
+  
+  .row-field[data-label="釣り場名"]{display:block;margin-top:4px}
+  
+  .more{display:inline-block;padding:6px 10px;background:rgba(100,181,255,0.15);border-radius:6px;font-size:13px;margin-top:4px;cursor:pointer;user-select:none}
+  .more:active{background:rgba(100,181,255,0.25)}
+  
+  .controls{flex-direction:column;align-items:stretch}
+  .tab{padding:8px 10px;font-size:13px}
+}
