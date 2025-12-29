@@ -4,7 +4,17 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ペンペンのつりんちゅ感想記</title>
-<link rel="stylesheet" href="css/osakanadiary_modern.css">
+<link rel="stylesheet" href="css/osakanadiary_modern.css" id="mainStylesheet">
+<script>
+// CSSキャッシュバスター：ファイル変更時に最新版を読み込む
+(function() {
+  const stylesheet = document.getElementById('mainStylesheet');
+  const now = new Date();
+  const hour = now.getHours();
+  const minute = now.getMinutes();
+  stylesheet.href = `css/osakanadiary_modern.css?v=${now.getFullYear()}${String(now.getMonth()+1).padStart(2,'0')}${String(now.getDate()).padStart(2,'0')}${String(hour).padStart(2,'0')}${String(minute).padStart(2,'0')}`;
+})();
+</script>
 </head>
 <body>
 
