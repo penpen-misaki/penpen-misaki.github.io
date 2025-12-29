@@ -12,7 +12,7 @@
 *{box-sizing:border-box}
 html,body{height:100%}
 body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0);color:var(--muted);-webkit-font-smoothing:antialiased;line-height:1.45}
-.container{max-width:1100px;margin:28px auto;padding:20px}
+.container{max-width:1100px;width:100%;margin:28px auto;padding:20px;overflow-x:hidden}
 .header{background:transparent;color:var(--accent-2);font-weight:var(--fw-semibold);font-size:22px;padding:18px 12px;border-radius:10px;text-align:center;letter-spacing:0.6px;display:flex;align-items:center;justify-content:center;gap:12px}
 .header-icon{height:22px;width:auto;vertical-align:middle}
 .topbar{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px}
@@ -103,31 +103,32 @@ body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0
 
 /* Tablet: 900px以下 */
 @media(max-width:900px){
-  .container{padding:12px}
+  .container{padding:12px;overflow-x:hidden}
   .topbar{flex-direction:column;align-items:stretch}
   .controls input{min-width:120px}
-  .tabs{overflow:auto}
-  .row-card{grid-template-columns:1fr;gap:12px;padding:12px}
-  .row-field[data-label="ウオ名"]{grid-column:1}
-  .row-field[data-label="カテゴリ"]{grid-column:1}
-  .row-field[data-label="仕留めた日"]{grid-column:1;display:block}
-  .row-field[data-label="罵倒度"]{grid-column:1;text-align:left}
-  .row-field[data-label="感想"]{grid-column:1}
-  .row-field[data-label="釣り場名"]{grid-column:1}
+  .controls input,.controls select{max-width:100%;overflow-x:hidden}
+  .tabs{overflow:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+  .row-card{grid-template-columns:1fr;gap:12px;padding:12px;overflow-x:hidden}
+  .row-field[data-label="ウオ名"]{grid-column:1;overflow-x:hidden}
+  .row-field[data-label="カテゴリ"]{grid-column:1;overflow-x:hidden}
+  .row-field[data-label="仕留めた日"]{grid-column:1;display:block;overflow-x:hidden}
+  .row-field[data-label="罵倒度"]{grid-column:1;text-align:left;overflow-x:hidden}
+  .row-field[data-label="感想"]{grid-column:1;overflow-x:hidden;word-break:break-word}
+  .row-field[data-label="釣り場名"]{grid-column:1;overflow-x:hidden;word-break:break-word}
 }
 
 /* Mobile: 600px以下 */
 @media(max-width:600px){
-  .container{padding:10px}
-  .row-card{grid-template-columns:1fr;gap:8px;padding:12px}
+  .container{padding:10px;overflow-x:hidden}
+  .row-card{grid-template-columns:1fr;gap:8px;padding:12px;overflow-x:hidden}
   
   /* Fish name, category, insult on single line */
   .row-field[data-label="ウオ名"],
   .row-field[data-label="カテゴリ"],
-  .row-field[data-label="罵倒度"]{display:inline-block;margin-right:8px;white-space:nowrap}
+  .row-field[data-label="罵倒度"]{display:inline-block;margin-right:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   
-  .row-field[data-label="ウオ名"]{display:flex;width:100%;align-items:center}
-  .row-field[data-label="ウオ名"] .patch-badge{margin-left:auto}
+  .row-field[data-label="ウオ名"]{display:flex;width:100%;align-items:center;overflow:visible}
+  .row-field[data-label="ウオ名"] .patch-badge{margin-left:auto;flex-shrink:0}
   
   /* Fish name with catch date becomes clickable */
   .row-field.fish-name-link{cursor:pointer;text-decoration:underline;text-decoration-style:dotted;text-decoration-color:rgba(255,255,255,0.3)}
@@ -135,13 +136,14 @@ body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0
   
   .row-field[data-label="仕留めた日"]{display:none}
   
-  .row-field[data-label="感想"]{display:block;margin-top:4px}
+  .row-field[data-label="感想"]{display:block;margin-top:4px;overflow-x:hidden;word-break:break-word}
   
-  .row-field[data-label="釣り場名"]{display:block;margin-top:4px}
+  .row-field[data-label="釣り場名"]{display:block;margin-top:4px;overflow-x:hidden;word-break:break-word}
   
   .more{display:inline-block;padding:6px 10px;background:rgba(100,181,255,0.15);border-radius:6px;font-size:13px;margin-top:4px;cursor:pointer;user-select:none}
   .more:active{background:rgba(100,181,255,0.25)}
   
-  .controls{flex-direction:column;align-items:stretch}
-  .tab{padding:8px 10px;font-size:13px}
+  .controls{flex-direction:column;align-items:stretch;overflow-x:hidden}
+  .controls input,.controls select{min-width:unset;width:100%}
+  .tab{padding:8px 10px;font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 }
