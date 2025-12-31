@@ -168,12 +168,14 @@ function render(){
   const fi=document.getElementById("filterInsult").value;
   const fc=document.getElementById("filterCategory").value;
 
+  const isLatestValue=(d)=>{
+    const v=((d["最新"]||"")+"").trim().toLowerCase();
+    return v==="1" || v==="true" || v==="yes";
+  };
+
   let data;
   if(currentPatch==="最新"){
-    data=allData.filter(d=>{
-      const v=((d["最新"]||"")+"").trim().toLowerCase();
-      return v==="1" || v==="true" || v==="yes";
-    });
+    data=allData.filter(d=>isLatestValue(d));
   } else {
     data=allData.filter(d=>d["パッチ"]===currentPatch);
   }
