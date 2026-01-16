@@ -95,6 +95,7 @@ body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0
 .row-field[data-label="仕留めた日"]{grid-column:1;color:var(--muted);font-size:13px}
 .row-field[data-label="罵倒度"]{grid-column:2;text-align:left;color:var(--muted);font-size:13px}
 .row-field[data-label="感想"]{grid-column:1/3}
+.row-field[data-label="みんなの感想"]{grid-column:1/3}
 .row-field[data-label="釣り場名"]{grid-column:1/3;color:var(--accent);font-weight:600}
 
 .more{color:var(--accent);cursor:pointer;display:inline-block;padding:4px 8px;background:rgba(100,181,255,0.15);border-radius:6px;font-size:13px;margin-top:4px}
@@ -114,6 +115,7 @@ body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0
   .row-field[data-label="仕留めた日"]{grid-column:1;display:block;overflow-x:hidden}
   .row-field[data-label="罵倒度"]{grid-column:1;text-align:left;overflow-x:hidden}
   .row-field[data-label="感想"]{grid-column:1;overflow-x:hidden;word-break:break-word}
+  .row-field[data-label="みんなの感想"]{grid-column:1;overflow-x:hidden;word-break:break-word}
   .row-field[data-label="釣り場名"]{grid-column:1;overflow-x:hidden;word-break:break-word}
 }
 
@@ -137,6 +139,8 @@ body{margin:0;font-family:Inter,Segoe UI,Meiryo,sans-serif;background:var(--bg-0
   .row-field[data-label="仕留めた日"]{display:none}
   
   .row-field[data-label="感想"]{display:block;margin-top:4px;overflow-x:hidden;word-break:break-word}
+  
+  .row-field[data-label="みんなの感想"]{display:block;margin-top:4px;overflow-x:hidden;word-break:break-word}
   
   .row-field[data-label="釣り場名"]{display:block;margin-top:4px;overflow-x:hidden;word-break:break-word}
   

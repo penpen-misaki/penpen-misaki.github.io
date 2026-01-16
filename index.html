@@ -186,7 +186,7 @@ function render(){
   if(fa) data=data.filter(d=>d["エリア"]===fa);
   if(fi) data=data.filter(d=>d["罵倒度"]===fi);
   if(fc) data=data.filter(d=>d["カテゴリ"]===fc);
-  if(filterByImpressionMode) data=data.filter(d=>(d["感想"]||"" ).trim().length>0);
+  if(filterByImpressionMode) data=data.filter(d=>((d["感想"]||"" ).trim().length>0) || ((d["みんなの感想"]||"" ).trim().length>0));
 
   const rows=data.map(d=>{
     const catchDate = (d["仕留めた日"]||"").trim();
@@ -204,6 +204,7 @@ function render(){
         <div class="row-field" data-label="仕留めた日">${escapeHTML(d["仕留めた日"]||"")}</div>
         <div class="row-field" data-label="罵倒度">${escapeHTML(d["罵倒度"]||"")}</div>
         <div class="row-field" data-label="感想">${makeImpression(escapeHTML(d["感想"]||""))}</div>
+        <div class="row-field" data-label="みんなの感想">${makeImpression(escapeHTML(d["みんなの感想"]||""))}</div>
         <div class="row-field" data-label="釣り場名">
           <span class="spot-link"
             data-area="${escapeHTML(d["エリア"]||"")}"
